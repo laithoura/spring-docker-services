@@ -1,0 +1,33 @@
+version: '3'
+services:
+  customer-1:
+    container_name: customer-1
+    image: thouradockerhub/customer:latest
+    ports:
+      - "9090:9090"
+    networks:
+      - spring-cloud-network
+  customer-2:
+    container_name: customer-2
+    image: thouradockerhub/customer:latest
+    ports:
+      - "9091:9090"
+    networks:
+      - spring-cloud-network
+  message-1:
+    container_name: message-1
+    image: thouradockerhub/message:latest
+    ports:
+      - "8090:9090"
+    networks:
+      - spring-cloud-network
+  message-2:
+    container_name: message-2
+    image: thouradockerhub/message:latest
+    ports:
+      - "8091:9090"
+    networks:
+      - spring-cloud-network
+networks:
+  spring-cloud-network:
+    driver: bridge
