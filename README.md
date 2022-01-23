@@ -9,10 +9,13 @@ It's a docker-based microservices application.
 # Prerequisite
 - Docker
 - Docker Compose
+- [Docker Hub](https://hub.docker.com/) 
 - OpenJDK 8
 - Spring Boot 2.5.7
 - Lombok
 - ...
+
+# CI & CD
 
 # Start
 
