@@ -1,6 +1,8 @@
 # This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
+# YouTube Tutorial: https://www.youtube.com/watch?v=R8_veQiYBjI&ab_channel=TechWorldwithNana
+
 name: Java CI with Maven
 
 on:
@@ -16,7 +18,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 8
+      - name: Set up JDK 1.8
         uses: actions/setup-java@v2
         with:
           java-version: '8'
@@ -24,3 +26,39 @@ jobs:
           cache: maven
       - name: Build with Maven
         run: mvn -B package --file pom.xml
+
+      - name: Build and Push Message docker image
+        uses: mr-smithers-excellent/docker-build-push@v5
+        with:
+          image: thouradockerhub/message
+          tags: latest
+          registry: docker.io
+          dockerfile: message/Dockerfile
+          username: ${{ secrets.DOCKER_USERNAME }}  # configure in Github: repo > Settings > Secrets > New secret
+          password: ${{ secrets.DOCKER_PASSWORD }}  # configure in Github: repo > Settings > Secrets > New secret
+
+      - name: Build and Push Customer docker image
+        uses: mr-smithers-excellent/docker-build-push@v5
+        with:
+          image: thouradockerhub/customer
+          tags: latest
+          registry: docker.io
+          dockerfile: customer/Dockerfile
+          username: ${{ secrets.DOCKER_USERNAME }}  # configure in Github: repo > settings > secret > add
+          password: ${{ secrets.DOCKER_PASSWORD }}  # configure in Github: repo > settings > secret > add
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }} # configure in Github: repo > settings > secret > add
+          password: ${{ secrets.DOCKER_PASSWORD }} # configure in Github: repo > settings > secret > add
+
+      - name: Build and push
+        id: docker_build_customer
+        uses: docker/build-push-action@v2
+        with:
+          context: ./customer
+          push: true
+          tags: thouradockerhub/customer:latest9
+      - name: Image digest
+        run: echo ${{ steps.docker_build_customer.outputs.digest }}
