@@ -30,8 +30,8 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }} # configure in Github: repo > settings > secret > add
-          password: ${{ secrets.DOCKER_PASSWORD }} # configure in Github: repo > settings > secret > add
+          username: ${{ secrets.DOCKER_USERNAME }} # configure in Github: repo > Settings > Secrets > New secret
+          password: ${{ secrets.DOCKER_PASSWORD }} # configure in Github: repo > Settings > Secrets > New secret
 
       - name: Build and push Customer image
         id: docker_build_customer
