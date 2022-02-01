@@ -37,7 +37,7 @@ jobs:
         with:
           context: customer
           push: true
-          tags: thouradockerhub/customer:latest
+          tags: thouradockerhub/customer:latest, thouradockerhub/customer:v1.0.2
       - name: Customer Image digest
         run: echo ${{ steps.docker_build_customer.outputs.digest }}
 
@@ -47,7 +47,7 @@ jobs:
         with:
           context: message
           push: true
-          tags: thouradockerhub/message:latest
+          tags: thouradockerhub/message:latest, thouradockerhub/message:v1.0.2
       - name: Message Image digest
         run: echo ${{ steps.docker_build_message.outputs.digest }}
 
