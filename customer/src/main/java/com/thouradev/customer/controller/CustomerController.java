@@ -12,7 +12,7 @@ public class CustomerController {
   @GetMapping(value = {"", "/message"})
   public String getMessage(@RequestParam(name = "message", required = false, defaultValue = "Docker") String message) {
     log.info("method=getMessage message={}", message);
-    return String.format("Customer -> CI/CD 2 : Hello from %s!", message);
+    return String.format("Customer -> CI/CD 1 2 3 : Hello from %s!", message);
   }
 
 }
