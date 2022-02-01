@@ -1,4 +1,4 @@
-package com.thouradev.message;
+package com.thouradev.message.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
