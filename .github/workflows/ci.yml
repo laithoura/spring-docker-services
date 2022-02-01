@@ -3,11 +3,9 @@
 
 # YouTube Tutorial: https://www.youtube.com/watch?v=R8_veQiYBjI&ab_channel=TechWorldwithNana
 
-name: Java CI with Maven
+name: CI
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -26,29 +24,3 @@ jobs:
           cache: maven
       - name: Build with Maven
         run: mvn -B package --file pom.xml
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }} # configure in Github: repo > Settings > Secrets > New secret
-          password: ${{ secrets.DOCKER_PASSWORD }} # configure in Github: repo > Settings > Secrets > New secret
-
-      - name: Build and push Customer image
-        id: docker_build_customer
-        uses: docker/build-push-action@v2
-        with:
-          context: customer
-          push: true
-          tags: thouradockerhub/customer:latest
-      - name: Customer Image digest
-        run: echo ${{ steps.docker_build_customer.outputs.digest }}
-
-      - name: Build and push Message image
-        id: docker_build_message
-        uses: docker/build-push-action@v2
-        with:
-          context: message
-          push: true
-          tags: thouradockerhub/message:latest
-      - name: Message Image digest
-        run: echo ${{ steps.docker_build_message.outputs.digest }}
