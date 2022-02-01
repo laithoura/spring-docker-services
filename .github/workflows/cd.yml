@@ -1,0 +1,73 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+# YouTube Tutorial: https://www.youtube.com/watch?v=R8_veQiYBjI&ab_channel=TechWorldwithNana
+
+name: CD
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build_and_push:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: maven
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }} # configure in Github: repo > Settings > Secrets > New secret
+          password: ${{ secrets.DOCKER_PASSWORD }} # configure in Github: repo > Settings > Secrets > New secret
+
+      - name: Build and push Customer image
+        id: docker_build_customer
+        uses: docker/build-push-action@v2
+        with:
+          context: customer
+          push: true
+          tags: thouradockerhub/customer:latest
+      - name: Customer Image digest
+        run: echo ${{ steps.docker_build_customer.outputs.digest }}
+
+      - name: Build and push Message image
+        id: docker_build_message
+        uses: docker/build-push-action@v2
+        with:
+          context: message
+          push: true
+          tags: thouradockerhub/message:latest
+      - name: Message Image digest
+        run: echo ${{ steps.docker_build_message.outputs.digest }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_and_push
+
+    steps:
+      - name: Deploy to Digital Ocean droplet via SSH action
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSHKEY }}
+          script: |
+            # go to project dir:
+            cd /home/live/spring/spring-docker
+            # stop & remove all containers:
+            docker-compose down
+            # remove all related images:
+            docker image rm thouradockerhub/customer:latest thouradockerhub/message:latest
+            # start all containers:
+            docker-compose up -d
